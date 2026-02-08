@@ -1,0 +1,9 @@
+Django==5.1.5
+djangorestframework==3.15.2
+psycopg[binary]==3.2.4
+Pyomo==6.8.2
+python-decouple==3.8
+django-cors-headers==4.6.0
+ruff==0.9.4
+pytest==8.3.4
+pytest-django==4.9.0
