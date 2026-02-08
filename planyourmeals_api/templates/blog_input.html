@@ -1,0 +1,64 @@
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>Plan Your Meals</title>
+  <meta name="description" content="PlanYourMeals">
+  <meta name="author" content="PlanYourMeals">
+  <!--<link rel="stylesheet" href="css/styles.css?v=1.0">-->
+  <style>
+	  	body:{
+	  		margin:0 auto;
+	  	}
+	  	.blog-form:{
+	  		margin:0 auto;
+	  		text-align: center;
+	  	}
+  </style>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.2/axios.min.js'></script>
+</head>
+<body>
+<div>
+	<div>
+		<form>
+		<label>Search</label>
+
+		<input type="text" id="search_qry" name="search_qry"/>{% csrf_token %}
+		<input type="button" id="search_btn" value="Search" />
+		</form>
+	</div>
+	<div class=blog-form>
+	<form method="POST" action="">{% csrf_token %}
+	    {{form.as_p}}
+	    <input type="submit" value="Save"/>
+	</form>
+	{{ form.media }}
+	</div>
+</div>
+<script>
+var submitSearch  = function() {
+    axios.defaults.xsrfCookieName = 'csrftoken'
+    axios.defaults.xsrfHeaderName = "X-CSRFTOKEN"
+	axios.post('/blog/blog_input_search/',
+			{
+				search_qry:document.getElementById('search_qry').value,
+                // headers:{
+                //    'X-CSRFToken': '{{ csrf_token }}'
+                // },
+                // crossDomain:false,
+            }
+
+		).then(res=>{
+			console.log(res['data'])
+		})
+}
+
+var button = document.querySelector('#search_btn')
+
+button.addEventListener('click', submitSearch, false);
+
+</script>
+</body>
+
+</html>
