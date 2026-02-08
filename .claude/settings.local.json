@@ -36,7 +36,18 @@
       "Bash(for dir in _legacy web agent infra/environments .github/workflows)",
       "Bash(do touch \"$dir/.gitkeep\")",
       "Bash(done)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nInitial scaffolding: monorepo structure, .gitignore, AGENTS.md\n\nCo-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git subtree:*)",
+      "Bash(git stash:*)",
+      "Bash(winget install:*)",
+      "Bash(py:*)",
+      "Bash(\"C:/Users/james/AppData/Local/Programs/Python/Python313/python.exe\" --version)",
+      "Bash(\"C:/Program Files/Docker/Docker/resources/bin/docker.exe\" --version)",
+      "Bash(\"C:/Program Files/Docker/Docker/resources/bin/docker.exe\" info)",
+      "Bash(cmd.exe /c start \"\" \"C:/Program Files/Docker/Docker/Docker Desktop.exe\")",
+      "Bash(wsl.exe --status:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nAdd Phase 1 status notes for Ubuntu continuation\n\nDetailed notes on what''s completed \\(Steps 1-7, 9-14\\), what''s\nblocked \\(Step 8 — first boot needs Docker\\), and exact commands\nto continue on Ubuntu dual-boot.\n\nCo-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>\nEOF\n\\)\")"
     ]
   }
 }
