@@ -1,0 +1,10 @@
+manage.py
+secrets.py
+*.bak
+*.dat
+*.dir
+*.schedulers
+*.png
+*.csv
+*.pyc
+*.json
