@@ -1,0 +1,42 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh repo view:*)",
+      "Bash(curl:*)",
+      "Bash(python -c:*)",
+      "Bash(powershell -Command \"\\(curl -s https://api.github.com/repos/jamesdvance/planyourmealsapi/contents/planyourmeals_api | ConvertFrom-Json\\) | ForEach-Object { $_name + '' \\('' + $_type + ''\\)'' }\")",
+      "Bash(powershell -Command \"\\(Invoke-RestMethod https://api.github.com/repos/jamesdvance/planyourmealsapi/contents/planyourmeals_api\\) | ForEach-Object { $_name + '' \\('' + $_type + ''\\)'' }\")",
+      "Bash(powershell -Command \"\\(Invoke-RestMethod https://api.github.com/repos/jamesdvance/planyourmealsapi/contents/core\\) | ForEach-Object { $_name + '' \\('' + $_type + ''\\)'' }\")",
+      "Bash(powershell -Command \"\\(Invoke-RestMethod https://api.github.com/repos/jamesdvance/planyourmealsapi/contents/food\\) | ForEach-Object { $_name + '' \\('' + $_type + ''\\)'' }\")",
+      "Bash(powershell -Command \"\\(Invoke-RestMethod https://api.github.com/repos/jamesdvance/planyourmealsapi/contents/plan\\) | ForEach-Object { $_name + '' \\('' + $_type + ''\\)'' }\")",
+      "Bash(powershell -Command \"\\(Invoke-RestMethod https://api.github.com/repos/jamesdvance/planyourmealsapi/contents/autoplanner\\) | ForEach-Object { $_name + '' \\('' + $_type + ''\\)'' }\")",
+      "Bash(powershell -Command \"\\(Invoke-RestMethod https://api.github.com/repos/jamesdvance/planyourmealsapi/contents/db_queries\\) | ForEach-Object { $_name + '' \\('' + $_type + ''\\)'' }\")",
+      "Bash(powershell -Command \"\\(Invoke-RestMethod https://api.github.com/repos/jamesdvance/planyourmealsapi/contents/markdownx\\) | ForEach-Object { $_name + '' \\('' + $_type + ''\\)'' }\")",
+      "Bash(powershell -Command \"\\(Invoke-RestMethod https://api.github.com/repos/jamesdvance/planyourmeals_react/contents/planyourmeals\\) | ForEach-Object { $_name + '' \\('' + $_type + ''\\)'' }\")",
+      "Bash(curl.exe:*)",
+      "Bash(powershell:*)",
+      "Bash(docker:*)",
+      "Bash(docker-compose:*)",
+      "Bash(terraform:*)",
+      "Bash(pip:*)",
+      "Bash(pip3:*)",
+      "Bash(npm --version:*)",
+      "Bash(cbc --version:*)",
+      "Bash(git --version:*)",
+      "Bash(gh:*)",
+      "Bash(java --version:*)",
+      "Bash(go version:*)",
+      "Bash(rustc:*)",
+      "Bash(aws:*)",
+      "Bash(kubectl version:*)",
+      "Bash(make:*)",
+      "Bash(systeminfo:*)",
+      "Bash(python3:*)",
+      "Bash(git -C \"C:\\\\Users\\\\james\\\\Desktop\\\\planyourmeals_agent\" log --oneline -20)",
+      "Bash(for dir in _legacy web agent infra/environments .github/workflows)",
+      "Bash(do touch \"$dir/.gitkeep\")",
+      "Bash(done)",
+      "Bash(git add:*)"
+    ]
+  }
+}
