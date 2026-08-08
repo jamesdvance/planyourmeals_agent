@@ -7,25 +7,10 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from typing import Any
 
 import numpy as np
 import pandas as pd
 from django.db import connection as django_connection
-from pyomo.environ import (
-    Binary,
-    ConcreteModel,
-    Constraint,
-    NonNegativeIntegers,
-    Objective,
-    Param,
-    Set,
-    SolverFactory,
-    Var,
-    summation,
-)
-
-from .autoplan_week import SOLVER_NAME
 
 logger = logging.getLogger(__name__)
 
@@ -99,9 +84,7 @@ class AlternativesEngine:
         excluded_ids = set(alt_df["food_key"].values) if not alt_df.empty else set()
         sim_food_df = self.food_df[~self.food_df["food_key"].isin(excluded_ids)].copy()
 
-        req_cols = list(
-            {ABREV_TO_NUT[req[:3]] for req in self.reqs_dict if "cal" not in req}
-        )
+        req_cols = list({ABREV_TO_NUT[req[:3]] for req in self.reqs_dict if "cal" not in req})
 
         tgt_food_df = self._query_single_food(self.food_id)
         if tgt_food_df.empty or sim_food_df.empty:
@@ -118,9 +101,7 @@ class AlternativesEngine:
             nutrient = ABREV_TO_NUT[nut_abrev]
             lb = reqs_dict.get(f"{nut_abrev}_lb", 0)
             ub = reqs_dict.get(f"{nut_abrev}_ub", float("inf"))
-            loop_df = loop_df[
-                (loop_df[nutrient] * j >= lb) & (loop_df[nutrient] * j <= ub)
-            ]
+            loop_df = loop_df[(loop_df[nutrient] * j >= lb) & (loop_df[nutrient] * j <= ub)]
         return loop_df.assign(amt=j)
 
     def _no_opt_solve(self, reqs_dict: dict, food_df: pd.DataFrame) -> pd.DataFrame:
@@ -146,7 +127,9 @@ class AlternativesEngine:
         fd_idx_cols = [f"{req}_index" for req in req_cols]
 
         # Check that index columns exist
-        available_cols = [c for c in fd_idx_cols if c in tgt_food_df.columns and c in food_df.columns]
+        available_cols = [
+            c for c in fd_idx_cols if c in tgt_food_df.columns and c in food_df.columns
+        ]
         if not available_cols:
             return pd.DataFrame()
 

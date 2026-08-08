@@ -16,6 +16,7 @@ from typing import Any
 import numpy as np
 import pandas as pd
 from django.db import connection as django_connection
+from pyomo.core import TransformationFactory
 from pyomo.environ import (
     Binary,
     ConcreteModel,
@@ -29,7 +30,7 @@ from pyomo.environ import (
     inequality,
     sum_product,
 )
-from pyomo.gdp import Disjunct, Disjunction, TransformationFactory
+from pyomo.gdp import Disjunct, Disjunction
 
 logger = logging.getLogger(__name__)
 
@@ -116,21 +117,19 @@ class WeekAutoPlanner:
             "user_id": self.user_id,
             "week_start_dt": self.week_start_dt,
             "week_end_dt": self.week_end_dt,
-            "menu_id_list": tuple(menu_ids),
-            "tag_id_list": tuple(tag_ids),
-            "rest_id_list": tuple(rest_ids),
+            "menu_id_list": list(menu_ids),
+            "tag_id_list": list(tag_ids),
+            "rest_id_list": list(rest_ids),
         }
 
         food_df = self._query_food_df(params, qry)
         if food_df.empty:
-            return PlanResult(
-                results_df=pd.DataFrame(), status="no_data", model=None
-            )
+            return PlanResult(results_df=pd.DataFrame(), status="no_data", model=None)
 
         opt_input_df, leftover_dict = self._build_opt_dataset(food_df)
 
-        food_max, global_m, meal_food_tup, src_constr_dict, incl_dict = (
-            self._set_opt_variables(opt_input_df, days_list, meals_idx_tup)
+        food_max, global_m, meal_food_tup, src_constr_dict, incl_dict = self._set_opt_variables(
+            opt_input_df, days_list, meals_idx_tup
         )
 
         model = self._build_model(
@@ -216,7 +215,7 @@ class WeekAutoPlanner:
         LEFT JOIN core_userprobrejectfood pr
             ON f.id = pr.food_id
             AND pr.user_id = %(user_id)s
-        WHERE m.prefmenu_id IN %(menu_id_list)s
+        WHERE m.prefmenu_id = ANY(%(menu_id_list)s)
 
         UNION
 
@@ -257,7 +256,7 @@ class WeekAutoPlanner:
         LEFT JOIN core_userprobrejectfood pr
             ON f.id = pr.food_id
             AND pr.user_id = %(user_id)s
-        WHERE t.foodtag_id IN %(tag_id_list)s
+        WHERE t.foodtag_id = ANY(%(tag_id_list)s)
         """
 
     def _user_reqs_qry(self) -> str:
@@ -332,9 +331,7 @@ class WeekAutoPlanner:
             list(set(days_list)),
         )
 
-    def _build_opt_dataset(
-        self, food_df: pd.DataFrame
-    ) -> tuple[pd.DataFrame, dict]:
+    def _build_opt_dataset(self, food_df: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
         """
         Build the optimization input DataFrame from queried food data.
 
@@ -359,9 +356,7 @@ class WeekAutoPlanner:
                         ].copy()
                         loop_df["meal"] = meal["meal"]
                         loop_df["day"] = menu_dict["day"]
-                        opt_input_df = pd.concat(
-                            [opt_input_df, loop_df], ignore_index=True
-                        )
+                        opt_input_df = pd.concat([opt_input_df, loop_df], ignore_index=True)
 
         if opt_input_df.empty:
             return opt_input_df, leftover_dict
@@ -375,10 +370,10 @@ class WeekAutoPlanner:
         opt_input_df["last_use"] = pd.to_datetime(
             opt_input_df["last_use"].fillna(DEFAULT_LAST_VIEW)
         )
-        opt_input_df["max_servings"] = opt_input_df["max_servings"].fillna(
-            DEFAULT_MAX_SERVINGS
-        )
+        opt_input_df["max_servings"] = opt_input_df["max_servings"].fillna(DEFAULT_MAX_SERVINGS)
         opt_input_df = opt_input_df.fillna(0)
+        opt_input_df["last_view"] = pd.to_datetime(opt_input_df["last_view"])
+        opt_input_df["last_use"] = pd.to_datetime(opt_input_df["last_use"])
 
         # Build access index (unique key per food-day-meal-dish)
         opt_input_df["access_idx"] = (
@@ -397,17 +392,17 @@ class WeekAutoPlanner:
 
         # Calculate prob_r objective
         n = len(opt_input_df)
-        today = datetime.date.today()
+        today = pd.Timestamp.today().normalize()
+        days_since_view = (today - opt_input_df["last_view"]).dt.days
+        days_since_use = (today - opt_input_df["last_use"]).dt.days
         prob_r = (
             (1 - (opt_input_df["user_total_uses"] + 0.001) / (opt_input_df["viewed"] + 0.002))
             * PROB_R_USES_WEIGHT
             + (5 - opt_input_df["user_star_rating"]) * PROB_R_RATING_WEIGHT
             + np.random.rand(n) * PROB_R_RANDOM_WEIGHT
             + 1 / np.maximum([0.5] * n, opt_input_df["user_total_uses"]) * PROB_R_INV_USES_WEIGHT
-            + (1 / (((today - opt_input_df["last_view"].dt.date).dt.days) + 0.5))
-            * PROB_R_VIEW_RECENCY_WEIGHT
-            + (1 / (((today - opt_input_df["last_use"].dt.date).dt.days) + 0.5))
-            * PROB_R_USE_RECENCY_WEIGHT
+            + (1 / (days_since_view + 0.5)) * PROB_R_VIEW_RECENCY_WEIGHT
+            + (1 / (days_since_use + 0.5)) * PROB_R_USE_RECENCY_WEIGHT
         )
         opt_input_df["prob_r"] = prob_r
 
@@ -545,7 +540,11 @@ class WeekAutoPlanner:
                         ),
                     )
                 else:  # "dj"
-                    for suffix, dish in [("_wm", "Whole Meals"), ("_mc", "Main Courses"), ("_si", "Sides")]:
+                    for suffix, dish in [
+                        ("_wm", "Whole Meals"),
+                        ("_mc", "Main Courses"),
+                        ("_si", "Sides"),
+                    ]:
                         setattr(
                             model,
                             f"{day}_{meal}{suffix}",
@@ -597,9 +596,7 @@ class WeekAutoPlanner:
             setattr(
                 model,
                 f"{tup[0]}{tup[1]}{tup[2]}_non_rep",
-                Constraint(
-                    expr=sum(model.ind[m] for m in idx) <= MAX_REPEAT_PER_MEAL
-                ),
+                Constraint(expr=sum(model.ind[m] for m in idx) <= MAX_REPEAT_PER_MEAL),
             )
 
         # -- Disjunction / selection constraints --
@@ -611,11 +608,7 @@ class WeekAutoPlanner:
                         model,
                         f"{day}_{meal}_sel_wm",
                         Constraint(
-                            expr=sum(
-                                model.ind[m]
-                                for m in getattr(model, f"{day}_{meal}_wm")
-                            )
-                            == 1
+                            expr=sum(model.ind[m] for m in getattr(model, f"{day}_{meal}_wm")) == 1
                         ),
                     )
                 elif src_constr_dict[tup] == "bd":
@@ -623,11 +616,7 @@ class WeekAutoPlanner:
                         model,
                         f"{day}_{meal}_sel_mc",
                         Constraint(
-                            expr=sum(
-                                model.ind[m]
-                                for m in getattr(model, f"{day}_{meal}_mc")
-                            )
-                            == 1
+                            expr=sum(model.ind[m] for m in getattr(model, f"{day}_{meal}_mc")) == 1
                         ),
                     )
                     setattr(
@@ -636,10 +625,7 @@ class WeekAutoPlanner:
                         Constraint(
                             expr=inequality(
                                 sides_dict[meal]["min"],
-                                sum(
-                                    model.ind[m]
-                                    for m in getattr(model, f"{day}_{meal}_si")
-                                ),
+                                sum(model.ind[m] for m in getattr(model, f"{day}_{meal}_si")),
                             )
                         ),
                     )
@@ -648,46 +634,28 @@ class WeekAutoPlanner:
                     sa_dj = Disjunct()
                     setattr(model, f"{day}_{meal}_sel_sa", sa_dj)
                     sa_dj.c1 = Constraint(
-                        expr=sum(
-                            model.ind[m] for m in getattr(model, f"{day}_{meal}_wm")
-                        )
-                        == 1
+                        expr=sum(model.ind[m] for m in getattr(model, f"{day}_{meal}_wm")) == 1
                     )
                     sa_dj.c2 = Constraint(
-                        expr=sum(
-                            model.ind[m] for m in getattr(model, f"{day}_{meal}_mc")
-                        )
-                        == 0
+                        expr=sum(model.ind[m] for m in getattr(model, f"{day}_{meal}_mc")) == 0
                     )
                     sa_dj.c3 = Constraint(
-                        expr=sum(
-                            model.ind[m] for m in getattr(model, f"{day}_{meal}_si")
-                        )
-                        == 0
+                        expr=sum(model.ind[m] for m in getattr(model, f"{day}_{meal}_si")) == 0
                     )
 
                     # By-dish disjunct
                     bd_dj = Disjunct()
                     setattr(model, f"{day}_{meal}_sel_bd", bd_dj)
                     bd_dj.c1 = Constraint(
-                        expr=sum(
-                            model.ind[m] for m in getattr(model, f"{day}_{meal}_wm")
-                        )
-                        == 0
+                        expr=sum(model.ind[m] for m in getattr(model, f"{day}_{meal}_wm")) == 0
                     )
                     bd_dj.c2 = Constraint(
-                        expr=sum(
-                            model.ind[m] for m in getattr(model, f"{day}_{meal}_mc")
-                        )
-                        == 1
+                        expr=sum(model.ind[m] for m in getattr(model, f"{day}_{meal}_mc")) == 1
                     )
                     bd_dj.c3 = Constraint(
                         expr=inequality(
                             sides_dict[meal]["min"],
-                            sum(
-                                model.ind[m]
-                                for m in getattr(model, f"{day}_{meal}_si")
-                            ),
+                            sum(model.ind[m] for m in getattr(model, f"{day}_{meal}_si")),
                             sides_dict[meal]["max"],
                         )
                     )
@@ -704,10 +672,7 @@ class WeekAutoPlanner:
                     model,
                     f"{day}_{meal}_ind_n",
                     Constraint(
-                        expr=sum(
-                            model.ind[m] for m in getattr(model, f"{day}_{meal}")
-                        )
-                        <= n_snack
+                        expr=sum(model.ind[m] for m in getattr(model, f"{day}_{meal}")) <= n_snack
                     ),
                 )
 

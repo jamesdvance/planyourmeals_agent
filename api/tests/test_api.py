@@ -5,10 +5,8 @@ API endpoint smoke tests using DRF test client.
 import datetime
 
 import pytest
-from django.contrib.auth.models import User
 from rest_framework.test import APIClient
 
-from app.food.models import Food
 from app.plan.models import FoodAmount, Meal, PlanMeal
 
 

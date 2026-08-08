@@ -16,9 +16,7 @@ class ProfileView(APIView):
         try:
             profile = request.user.profile
         except Profile.DoesNotExist:
-            return Response(
-                {"detail": "Profile not found."}, status=status.HTTP_404_NOT_FOUND
-            )
+            return Response({"detail": "Profile not found."}, status=status.HTTP_404_NOT_FOUND)
         serializer = ProfileSerializer(profile)
         return Response(serializer.data)
 
@@ -32,9 +30,7 @@ class NutrientUpdateView(APIView):
         try:
             profile = request.user.profile
         except Profile.DoesNotExist:
-            return Response(
-                {"detail": "Profile not found."}, status=status.HTTP_404_NOT_FOUND
-            )
+            return Response({"detail": "Profile not found."}, status=status.HTTP_404_NOT_FOUND)
 
         serializer = NutrientUpdateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)

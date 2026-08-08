@@ -78,22 +78,52 @@ class Command(BaseCommand):
         # Assign foods to PrefMenus
         foods = list(Food.objects.all())
         if not foods:
-            self.stdout.write(
-                self.style.WARNING("No foods found. Run load_seed_foods first.")
-            )
+            self.stdout.write(self.style.WARNING("No foods found. Run load_seed_foods first."))
             return
 
         # Breakfast foods: oatmeal, eggs, yogurt, banana, overnight oats, smoothie bowl, egg omelette
-        breakfast_keywords = ["Oatmeal", "Eggs", "Yogurt", "Banana", "Overnight", "Smoothie", "Omelette", "Granola"]
+        breakfast_keywords = [
+            "Oatmeal",
+            "Eggs",
+            "Yogurt",
+            "Banana",
+            "Overnight",
+            "Smoothie",
+            "Omelette",
+            "Granola",
+        ]
         # Lunch foods: sandwiches, salads, bowls
         lunch_keywords = ["Sandwich", "Salad", "Bowl", "Burrito", "Hummus", "Stir-Fry"]
         # Dinner foods: chicken, salmon, beef, pork, turkey, shrimp, tuna
-        dinner_keywords = ["Chicken", "Salmon", "Beef", "Pork", "Turkey Meatballs", "Shrimp", "Tuna", "Tofu"]
+        dinner_keywords = [
+            "Chicken",
+            "Salmon",
+            "Beef",
+            "Pork",
+            "Turkey Meatballs",
+            "Shrimp",
+            "Tuna",
+            "Tofu",
+        ]
         # Snack foods: almonds, trail mix, protein bar, rice cake, blueberries, apple
         snack_keywords = ["Almond", "Trail", "Protein Bar", "Rice Cake", "Blueberries", "Apple"]
 
         # Side foods available for all non-snack meals
-        side_keywords = ["Rice", "Quinoa", "Sweet Potato", "Broccoli", "Spinach", "Kale", "Beans", "Lentils", "Cauliflower", "Zucchini", "Pasta", "Bread", "Edamame"]
+        side_keywords = [
+            "Rice",
+            "Quinoa",
+            "Sweet Potato",
+            "Broccoli",
+            "Spinach",
+            "Kale",
+            "Beans",
+            "Lentils",
+            "Cauliflower",
+            "Zucchini",
+            "Pasta",
+            "Bread",
+            "Edamame",
+        ]
 
         def assign_foods(pref_menu, keywords, meal_type, dish="Whole Meals"):
             for food in foods:

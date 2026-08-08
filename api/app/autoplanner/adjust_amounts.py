@@ -122,12 +122,8 @@ class AmountAdjuster:
             params={"user_id": self.user_id, "plan_date": self.plan_date},
             con=django_connection,
         )
-        food_df["last_view"] = pd.to_datetime(
-            food_df["last_view"].fillna(DEFAULT_LAST_VIEW)
-        )
-        food_df["last_use"] = pd.to_datetime(
-            food_df["last_use"].fillna(DEFAULT_LAST_VIEW)
-        )
+        food_df["last_view"] = pd.to_datetime(food_df["last_view"].fillna(DEFAULT_LAST_VIEW))
+        food_df["last_use"] = pd.to_datetime(food_df["last_use"].fillna(DEFAULT_LAST_VIEW))
         food_df = food_df.fillna(0)
 
         # Separate included (adjust) from excluded (fixed)
@@ -149,9 +145,7 @@ class AmountAdjuster:
 
         # Set bounds per food
         food_df_adj["lb_col"] = 1
-        food_df_adj["ub_col"] = np.round(
-            food_df_adj["max_servings"] / self.adjust_mult
-        )
+        food_df_adj["ub_col"] = np.round(food_df_adj["max_servings"] / self.adjust_mult)
 
         # Normalize nutrients by adjust_mult
         for req in self.req_cols:
@@ -189,12 +183,8 @@ class AmountAdjuster:
         food_df_dict = food_df[["prob_r"] + req_cols].to_dict("list")
         model.bounds = Param(model.N, initialize=reqs_df[req_cols].to_dict("list"))
         model.amt = Var(model.full_I, bounds=(1, fd_mx), within=NonNegativeIntegers)
-        model.amt_lb = Param(
-            model.full_I, initialize=food_df["lb_col"].to_dict()
-        )
-        model.amt_ub = Param(
-            model.full_I, initialize=food_df["ub_col"].to_dict()
-        )
+        model.amt_lb = Param(model.full_I, initialize=food_df["lb_col"].to_dict())
+        model.amt_ub = Param(model.full_I, initialize=food_df["ub_col"].to_dict())
 
         def ml_bounds(model, n):
             return (
@@ -223,9 +213,7 @@ class AmountAdjuster:
         status = str(result.solver.termination_condition)
         return model, status
 
-    def _parse_results(
-        self, model: ConcreteModel, food_df: pd.DataFrame
-    ) -> pd.DataFrame:
+    def _parse_results(self, model: ConcreteModel, food_df: pd.DataFrame) -> pd.DataFrame:
         sol_li = [model.amt[i].value for i in range(len(food_df))]
         sol_li = [0 if s is None else s for s in sol_li]
         return_df = food_df.assign(amt=sol_li)

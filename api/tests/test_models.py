@@ -1,14 +1,11 @@
 import datetime
 
 import pytest
-from django.contrib.auth.models import User
 from django.db import IntegrityError
 
 from app.core.models import (
     FoodPreferences,
     PrefMenu,
-    Profile,
-    PublicMenu,
     UserMenu,
     UserProbRejectFood,
 )
@@ -79,9 +76,7 @@ class TestCoreModels:
         assert profile.pro_ub == 131
 
     def test_prefmenu_and_food_preferences(self, user, sample_food):
-        pref_menu = PrefMenu.objects.create(
-            user=user, default_flg=True, meal_type="Dinner"
-        )
+        pref_menu = PrefMenu.objects.create(user=user, default_flg=True, meal_type="Dinner")
         fp = FoodPreferences.objects.create(
             meal_type="Dinner",
             prefmenu=pref_menu,
@@ -139,10 +134,6 @@ class TestPlanModels:
 
     def test_unique_constraint(self, user, sample_food):
         today = datetime.date.today()
-        PlanMeal.objects.create(
-            user=user, plan_date=today, meal_type="Dinner", ml_cd="di"
-        )
+        PlanMeal.objects.create(user=user, plan_date=today, meal_type="Dinner", ml_cd="di")
         with pytest.raises(IntegrityError):
-            PlanMeal.objects.create(
-                user=user, plan_date=today, meal_type="Dinner", ml_cd="di"
-            )
+            PlanMeal.objects.create(user=user, plan_date=today, meal_type="Dinner", ml_cd="di")

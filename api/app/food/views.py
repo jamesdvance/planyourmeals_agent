@@ -17,7 +17,8 @@ class FoodSearchView(APIView):
         query = request.query_params.get("q", "").strip()
         if len(query) < 2:
             return Response(
-                {"detail": "Query must be at least 2 characters."}, status=status.HTTP_400_BAD_REQUEST
+                {"detail": "Query must be at least 2 characters."},
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         sql = """
@@ -45,8 +46,6 @@ class FoodDetailView(APIView):
         try:
             food = Food.objects.get(pk=pk)
         except Food.DoesNotExist:
-            return Response(
-                {"detail": "Food not found."}, status=status.HTTP_404_NOT_FOUND
-            )
+            return Response({"detail": "Food not found."}, status=status.HTTP_404_NOT_FOUND)
         serializer = FoodSerializer(food)
         return Response(serializer.data)

@@ -11,7 +11,6 @@ from django.core.management.base import BaseCommand
 
 from app.food.models import Food, FoodIndex, FoodTag, FoodTagMapping
 
-
 # fmt: off
 SEED_FOODS = [
     # (description, brand, calories, protein_g, fat_g, carb_g, sat_fat_g, fiber_g, sugar_g, sodium_mg, chol_mg, calcium_mg, iron_mg, vit_a_mcg, vit_c_mg, serving_size_val, food_type_grp, dish)
@@ -73,9 +72,77 @@ SEED_TAGS = ["high-protein", "vegetarian", "low-carb", "gluten-free", "quick-pre
 # Tag assignments by food index
 TAG_ASSIGNMENTS = {
     "high-protein": [0, 1, 2, 3, 18, 28, 29, 30, 31, 36],
-    "vegetarian": [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 19, 20, 21, 22, 23, 24, 25, 26, 27, 32, 33, 34, 35, 37, 38, 44, 45, 46, 48, 49],
+    "vegetarian": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        32,
+        33,
+        34,
+        35,
+        37,
+        38,
+        44,
+        45,
+        46,
+        48,
+        49,
+    ],
     "low-carb": [0, 1, 2, 3, 9, 10, 11, 12, 18, 28, 29, 30, 31, 48, 49],
-    "gluten-free": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 22, 23, 24, 25, 26, 28, 29, 30, 31, 32, 33, 48, 49],
+    "gluten-free": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        22,
+        23,
+        24,
+        25,
+        26,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        48,
+        49,
+    ],
     "quick-prep": [14, 15, 16, 17, 22, 23, 26, 27, 34, 35, 36, 37, 38],
 }
 
@@ -96,7 +163,26 @@ class Command(BaseCommand):
         # Create foods
         foods = []
         for i, row in enumerate(SEED_FOODS):
-            (desc, brand, cal, pro, fat_, carb, sat, fib, sug, sod, chol, calc, iron, vta, vtc, ssv, ftg, dish) = row
+            (
+                desc,
+                brand,
+                cal,
+                pro,
+                fat_,
+                carb,
+                sat,
+                fib,
+                sug,
+                sod,
+                chol,
+                calc,
+                iron,
+                vta,
+                vtc,
+                ssv,
+                ftg,
+                dish,
+            ) = row
             food = Food.objects.create(
                 food_description=desc,
                 brand=brand or "",

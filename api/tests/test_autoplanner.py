@@ -60,9 +60,7 @@ class TestAutoplannerBuild:
             n_snack=2,
         )
 
-        tag_ids, rest_ids, menu_ids, meals_idx_tup, days_list = (
-            planner._prep_query_params()
-        )
+        tag_ids, rest_ids, menu_ids, meals_idx_tup, days_list = planner._prep_query_params()
 
         assert len(meals_idx_tup) == 4
         assert "day1" in days_list

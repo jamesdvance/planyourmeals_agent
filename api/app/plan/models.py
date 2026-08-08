@@ -27,9 +27,7 @@ class Meal(models.Model):
     )
     created = models.DateTimeField(auto_now_add=True)
     mealname = models.CharField(max_length=300, default="Unnamed")
-    meal_type = models.CharField(
-        choices=MEAL_TYPE_CHOICES, max_length=300, default="Any"
-    )
+    meal_type = models.CharField(choices=MEAL_TYPE_CHOICES, max_length=300, default="Any")
     food = models.ManyToManyField(Food, through="FoodAmount")
     saved = models.BooleanField(default=False)
 
@@ -43,9 +41,7 @@ class Meal(models.Model):
 class FoodAmount(models.Model):
     """A food in a meal with its serving amount."""
 
-    food = models.ForeignKey(
-        Food, on_delete=models.CASCADE, related_name="meal_amounts"
-    )
+    food = models.ForeignKey(Food, on_delete=models.CASCADE, related_name="meal_amounts")
     meal = models.ForeignKey(Meal, on_delete=models.CASCADE, related_name="food_amounts")
     amt = models.DecimalField(max_digits=6, decimal_places=2, default=1)
     serving_size_idx = models.IntegerField(default=0)
@@ -66,9 +62,7 @@ class PlanMeal(models.Model):
     )
     plan_date = models.DateField()
     ml_cd = models.CharField(choices=MEAL_CODE_CHOICES, max_length=2, default="di")
-    meal_type = models.CharField(
-        choices=MEAL_TYPE_CHOICES, max_length=20, default="Dinner"
-    )
+    meal_type = models.CharField(choices=MEAL_TYPE_CHOICES, max_length=20, default="Dinner")
     meal = models.ForeignKey(
         Meal, null=True, on_delete=models.SET_NULL, blank=True, related_name="plan_slots"
     )

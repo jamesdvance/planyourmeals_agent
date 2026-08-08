@@ -3,7 +3,6 @@ from django.contrib.auth.models import User
 
 from app.core.models import FoodPreferences, PrefMenu, Profile, UserMenu
 from app.food.models import Food, FoodIndex
-from app.plan.models import FoodAmount, Meal, PlanMeal
 
 
 @pytest.fixture
@@ -100,18 +99,10 @@ def sample_foods(db):
 @pytest.fixture
 def user_with_menus(user, profile, sample_foods):
     """Create a user with PrefMenus and FoodPreferences."""
-    br_pref = PrefMenu.objects.create(
-        user=user, default_flg=True, meal_type="Breakfast"
-    )
-    lu_pref = PrefMenu.objects.create(
-        user=user, default_flg=True, meal_type="Lunch"
-    )
-    di_pref = PrefMenu.objects.create(
-        user=user, default_flg=True, meal_type="Dinner"
-    )
-    sn_pref = PrefMenu.objects.create(
-        user=user, default_flg=True, meal_type="Snack"
-    )
+    br_pref = PrefMenu.objects.create(user=user, default_flg=True, meal_type="Breakfast")
+    lu_pref = PrefMenu.objects.create(user=user, default_flg=True, meal_type="Lunch")
+    di_pref = PrefMenu.objects.create(user=user, default_flg=True, meal_type="Dinner")
+    sn_pref = PrefMenu.objects.create(user=user, default_flg=True, meal_type="Snack")
 
     UserMenu.objects.create(
         user=user,

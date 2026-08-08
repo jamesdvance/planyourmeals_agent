@@ -5,8 +5,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .autoplan_week import WeekAutoPlanner
 from .alternatives_engine import AlternativesEngine
+from .autoplan_week import WeekAutoPlanner
 
 
 class AutoplanWeekView(APIView):
@@ -86,9 +86,7 @@ class GetFoodAlternativeView(APIView):
                     else []
                 ),
                 "similar": (
-                    result.similar_df.to_dict("records")
-                    if not result.similar_df.empty
-                    else []
+                    result.similar_df.to_dict("records") if not result.similar_df.empty else []
                 ),
             },
             status=status.HTTP_200_OK,

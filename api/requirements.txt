@@ -2,6 +2,8 @@ Django==5.1.5
 djangorestframework==3.15.2
 psycopg[binary]==3.2.4
 Pyomo==6.8.2
+numpy==2.2.2
+pandas==2.2.3
 python-decouple==3.8
 django-cors-headers==4.6.0
 ruff==0.9.4

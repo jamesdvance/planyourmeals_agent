@@ -36,9 +36,7 @@ class Profile(models.Model):
     )
 
     # Physical stats
-    sex = models.CharField(
-        choices=SEX_CHOICES, max_length=10, default="male", null=True
-    )
+    sex = models.CharField(choices=SEX_CHOICES, max_length=10, default="male", null=True)
     age = models.PositiveSmallIntegerField(null=True)
     weight = models.DecimalField(max_digits=6, decimal_places=2, null=True)
     weight_unit = models.CharField(max_length=2, default="lb", null=True)
@@ -68,48 +66,20 @@ class Profile(models.Model):
 
     # Requirements (target/percentage values)
     cal_req = models.DecimalField(max_digits=7, decimal_places=2, default=2000)
-    pro_perc = models.DecimalField(
-        max_digits=3, decimal_places=2, default=0.25, blank=True
-    )
-    car_perc = models.DecimalField(
-        max_digits=3, decimal_places=2, default=0.40, blank=True
-    )
-    fat_perc = models.DecimalField(
-        max_digits=3, decimal_places=2, default=0.35, blank=True
-    )
-    stf_thr = models.DecimalField(
-        max_digits=6, decimal_places=2, null=True, blank=True
-    )
-    fib_req = models.DecimalField(
-        max_digits=6, decimal_places=2, null=True, blank=True
-    )
-    sug_thr = models.DecimalField(
-        max_digits=6, decimal_places=2, null=True, blank=True
-    )
-    sod_thr = models.DecimalField(
-        max_digits=6, decimal_places=2, null=True, blank=True
-    )
-    cho_thr = models.DecimalField(
-        max_digits=6, decimal_places=2, null=True, blank=True
-    )
-    clc_req = models.DecimalField(
-        max_digits=7, decimal_places=2, null=True, blank=True
-    )
-    irn_req = models.DecimalField(
-        max_digits=6, decimal_places=2, null=True, blank=True
-    )
-    vta_req = models.DecimalField(
-        max_digits=7, decimal_places=2, null=True, blank=True
-    )
-    vtc_req = models.DecimalField(
-        max_digits=6, decimal_places=2, null=True, blank=True
-    )
-    nsu_req = models.DecimalField(
-        max_digits=7, decimal_places=2, null=True, blank=True
-    )
-    nca_req = models.DecimalField(
-        max_digits=6, decimal_places=2, null=True, blank=True
-    )
+    pro_perc = models.DecimalField(max_digits=3, decimal_places=2, default=0.25, blank=True)
+    car_perc = models.DecimalField(max_digits=3, decimal_places=2, default=0.40, blank=True)
+    fat_perc = models.DecimalField(max_digits=3, decimal_places=2, default=0.35, blank=True)
+    stf_thr = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
+    fib_req = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
+    sug_thr = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
+    sod_thr = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
+    cho_thr = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
+    clc_req = models.DecimalField(max_digits=7, decimal_places=2, null=True, blank=True)
+    irn_req = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
+    vta_req = models.DecimalField(max_digits=7, decimal_places=2, null=True, blank=True)
+    vtc_req = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
+    nsu_req = models.DecimalField(max_digits=7, decimal_places=2, null=True, blank=True)
+    nca_req = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)
 
     # Upper bounds
     cal_ub = models.DecimalField(max_digits=6, decimal_places=2, default=2100)
@@ -205,9 +175,7 @@ class UserMenu(models.Model):
         on_delete=models.CASCADE,
         related_name="user_menus",
     )
-    cloned_from = models.ForeignKey(
-        PublicMenu, on_delete=models.SET_NULL, null=True, blank=True
-    )
+    cloned_from = models.ForeignKey(PublicMenu, on_delete=models.SET_NULL, null=True, blank=True)
     clone_date = models.DateField(null=True, blank=True)
     breakfast_prefmenu = models.ForeignKey(
         "PrefMenu",
@@ -248,9 +216,7 @@ class PrefMenu(models.Model):
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="pref_menus"
     )
     default_flg = models.BooleanField(default=False)
-    meal_type = models.CharField(
-        choices=MEAL_TYPE_CHOICES, max_length=10, default="Any"
-    )
+    meal_type = models.CharField(choices=MEAL_TYPE_CHOICES, max_length=10, default="Any")
     menu_name = models.CharField(max_length=300, null=True, blank=True)
 
     class Meta:
@@ -280,9 +246,7 @@ class FoodPreferences(models.Model):
 class UserProbRejectFood(models.Model):
     """Per-user food personalization scores for the optimizer."""
 
-    food = models.ForeignKey(
-        Food, on_delete=models.CASCADE, related_name="user_prob_reject"
-    )
+    food = models.ForeignKey(Food, on_delete=models.CASCADE, related_name="user_prob_reject")
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="food_scores"
     )
@@ -295,9 +259,7 @@ class UserProbRejectFood(models.Model):
     user_star_rating = models.FloatField(default=2.5)
     max_servings = models.FloatField(default=4)
     max_num_per_week = models.FloatField(default=2)
-    default_dish_num = models.CharField(
-        choices=DISH_CHOICES, default="Whole Meals", max_length=20
-    )
+    default_dish_num = models.CharField(choices=DISH_CHOICES, default="Whole Meals", max_length=20)
 
     class Meta:
         db_table = "core_userprobrejectfood"
@@ -314,9 +276,4 @@ class UserProbRejectFood(models.Model):
         total_uses = 1 / min(max(self.user_total_uses - self.removed, 1), 20)
         days_since = (datetime.date.today() - self.last_use).days + 0.05
         last_use_score = 1 / days_since
-        return (
-            like_ratio * 0.5
-            + last_use_score * 0.2
-            + total_uses * 0.3
-            + self.dislike_ind * 0.2
-        )
+        return like_ratio * 0.5 + last_use_score * 0.2 + total_uses * 0.3 + self.dislike_ind * 0.2

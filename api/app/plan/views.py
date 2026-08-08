@@ -17,13 +17,13 @@ class DayPlanView(APIView):
         try:
             plan_date = datetime.date.fromisoformat(date)
         except ValueError:
-            return Response(
-                {"detail": "Invalid date format. Use YYYY-MM-DD."}, status=400
-            )
+            return Response({"detail": "Invalid date format. Use YYYY-MM-DD."}, status=400)
 
-        plan_meals = PlanMeal.objects.filter(
-            user=request.user, plan_date=plan_date
-        ).select_related("meal").prefetch_related("meal__food_amounts__food")
+        plan_meals = (
+            PlanMeal.objects.filter(user=request.user, plan_date=plan_date)
+            .select_related("meal")
+            .prefetch_related("meal__food_amounts__food")
+        )
 
         serializer = PlanMealSerializer(plan_meals, many=True)
         return Response(serializer.data)

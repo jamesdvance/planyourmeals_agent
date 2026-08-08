@@ -37,9 +37,7 @@ class Food(models.Model):
     source = models.CharField(max_length=50, null=True, blank=True)
     ingredients_list = models.TextField(null=True, blank=True)
     serving_size_raw = models.CharField(max_length=200, null=True, blank=True)
-    serving_size_val = models.DecimalField(
-        max_digits=10, decimal_places=2, null=True, blank=True
-    )
+    serving_size_val = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     serving_size_unit = models.CharField(max_length=200, null=True, blank=True)
 
     # Nutrients (15 fields)
@@ -64,9 +62,7 @@ class Food(models.Model):
     tags = models.ManyToManyField(FoodTag, through="FoodTagMapping", blank=True)
 
     # Preferences defaults
-    default_dish_num = models.CharField(
-        choices=DISH_CHOICES, default="Whole Meals", max_length=20
-    )
+    default_dish_num = models.CharField(choices=DISH_CHOICES, default="Whole Meals", max_length=20)
     max_servings = models.FloatField(default=2)
     max_num_per_week = models.FloatField(default=2)
     star_rating = models.FloatField(default=2.5)
@@ -86,9 +82,7 @@ class Food(models.Model):
         db_table = "food_foods"
         indexes = [
             models.Index(fields=["food_description"], name="food_description_idx"),
-            models.Index(
-                fields=["is_recipe", "created_by"], name="food_recipe_creator_idx"
-            ),
+            models.Index(fields=["is_recipe", "created_by"], name="food_recipe_creator_idx"),
         ]
 
     def __str__(self) -> str:
@@ -100,9 +94,7 @@ class FoodTagMapping(models.Model):
 
     foodtag = models.ForeignKey(FoodTag, on_delete=models.CASCADE)
     food = models.ForeignKey(Food, on_delete=models.CASCADE)
-    added_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True
-    )
+    added_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
 
     class Meta:
         db_table = "food_taggedfoods"
@@ -147,9 +139,7 @@ class Recipe(models.Model):
     prep_time_minutes = models.PositiveIntegerField(null=True, blank=True)
     servings = models.DecimalField(max_digits=10, decimal_places=2, default=1)
     image_url = models.URLField(blank=True, default="")
-    added_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True
-    )
+    added_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -162,9 +152,7 @@ class Recipe(models.Model):
 class RecipeFood(models.Model):
     """An ingredient in a recipe (food FK + amount + unit)."""
 
-    recipe = models.ForeignKey(
-        Recipe, on_delete=models.CASCADE, related_name="ingredients"
-    )
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name="ingredients")
     ingred_food_desc = models.CharField(max_length=300)
     ingred_food = models.ForeignKey(
         Food, on_delete=models.SET_NULL, null=True, related_name="used_in_recipes"
